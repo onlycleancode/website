@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BlogCard from '../../../components/BlogCard.astro';
+import { enrichBlogEntry } from '../../../utils/blogHelpers';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const uniqueTags = [...new Set(posts.flatMap(post => post.data.tags))];
+
+  return uniqueTags.map(tag => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts
+        .filter(post => post.data.tags.includes(tag))
+        .sort((a, b) => {
+          const aDate = enrichBlogEntry(a).pubDate;
+          const bDate = enrichBlogEntry(b).pubDate;
+          return bDate.valueOf() - aDate.valueOf();
+        }),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+
+// Get all tags for the filter bar
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const allTags = [...new Set(allPosts.flatMap(post => post.data.tags))].sort();
+---
+
+<BaseLayout title={`Posts tagged "${tag}" | Blog`} description={`All posts tagged with ${tag}`}>
+  <section class="blog-header">
+    <div class="container">
+      <a href="/blog/" class="back-link">&larr; All Posts</a>
+      <h1>#{tag}</h1>
+      <p>{posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged with "{tag}"</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- Tag Filters -->
+      <div class="tag-filters">
+        <a href="/blog/" class="tag-button">All</a>
+        {allTags.map(t => (
+          <a
+            href={`/blog/tags/${t}/`}
+            class:list={['tag-button', { active: t === tag }]}
+          >
+            {t}
+          </a>
+        ))}
+      </div>
+
+      <!-- Posts Grid -->
+      <div class="posts-grid">
+        {posts.map(post => (
+          <BlogCard post={post} />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-header {
+    text-align: center;
+    padding: 4rem 0 2rem;
+    background: var(--bg-secondary);
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: #1d4ed8;
+  }
+
+  .blog-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+  }
+
+  .blog-header p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+  }
+</style>

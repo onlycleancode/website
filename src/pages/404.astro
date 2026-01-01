@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page Not Found">
+  <section class="error-page">
+    <div class="container">
+      <h1>404</h1>
+      <p class="subtitle">Page Not Found</p>
+      <p>The page you're looking for doesn't exist or has been moved.</p>
+      <div class="error-links">
+        <a href="/">Go Home</a>
+        <a href="/blog/">Browse Blog</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 0;
+  }
+
+  h1 {
+    font-size: 8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .subtitle {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .error-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .error-links a {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 0.5rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .error-links a:first-child {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  .error-links a:hover {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 5rem;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+    }
+
+    .error-links {
+      flex-direction: column;
+    }
+  }
+</style>

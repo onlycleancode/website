@@ -1,0 +1,224 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { enrichBlogEntry } from '../../utils/blogHelpers';
+
+// Get all non-draft posts, sorted by date (using enriched data for git-based dates)
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = posts.sort((a, b) => {
+  const aDate = enrichBlogEntry(a).pubDate;
+  const bDate = enrichBlogEntry(b).pubDate;
+  return bDate.valueOf() - aDate.valueOf();
+});
+
+// Extract all unique tags
+const allTags = [...new Set(posts.flatMap(post => post.data.tags))].sort();
+
+// Prepare posts data for server visualization
+const postsData = sortedPosts.map(post => ({
+  title: post.data.title,
+  url: `/blog/${post.slug}/`,
+  tags: post.data.tags,
+}));
+---
+
+<BaseLayout title="Blog | Joel Montano" description="Articles about software development, AI, systems, and more.">
+  <section class="blog-header">
+    <div class="container">
+      <h1>Blog</h1>
+      <p>Thoughts on software development, AI, systems, and technology.</p>
+
+      <!-- Pagefind Search -->
+      <div class="search-container" id="search"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- Tag Filters -->
+      {allTags.length > 0 && (
+        <div class="tag-filters">
+          <a href="/blog/" class="tag-button active">All</a>
+          {allTags.map(tag => (
+            <a href={`/blog/tags/${tag}/`} class="tag-button">{tag}</a>
+          ))}
+        </div>
+      )}
+
+      <!-- Posts Grid -->
+      <div class="posts-grid" data-pagefind-body>
+        {sortedPosts.length > 0 ? (
+          sortedPosts.map(post => (
+            <BlogCard post={post} />
+          ))
+        ) : (
+          <p class="empty-state">No posts yet. Check back soon!</p>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<!-- Pass posts data to client for server visualization -->
+<script define:vars={{ postsData }}>
+  window.__BLOG_POSTS__ = postsData;
+</script>
+
+<!-- Initialize Pagefind UI -->
+<script is:inline>
+  (async function initSearch() {
+    const container = document.getElementById('search');
+    if (!container) return;
+
+    // Create search input immediately
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search posts...';
+    searchInput.className = 'search-input';
+
+    const resultsContainer = document.createElement('div');
+    resultsContainer.className = 'search-results';
+
+    container.appendChild(searchInput);
+    container.appendChild(resultsContainer);
+
+    let pagefind = null;
+    let debounceTimer;
+
+    searchInput.addEventListener('input', async function(e) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async function() {
+        const query = e.target.value;
+        if (query.length < 2) {
+          resultsContainer.innerHTML = '';
+          return;
+        }
+
+        // Lazy load Pagefind on first search
+        if (!pagefind) {
+          try {
+            pagefind = await import('/pagefind/pagefind.js');
+            await pagefind.init();
+          } catch (err) {
+            resultsContainer.innerHTML = '<p class="no-results">Search index loading...</p>';
+            return;
+          }
+        }
+
+        const search = await pagefind.search(query);
+        const results = await Promise.all(
+          search.results.slice(0, 5).map(function(r) { return r.data(); })
+        );
+
+        if (results.length > 0) {
+          resultsContainer.innerHTML = results
+            .map(function(r) {
+              return '<a href="' + r.url + '" class="search-result">' +
+                '<strong>' + (r.meta.title || 'Untitled') + '</strong>' +
+                '<p>' + r.excerpt + '</p>' +
+              '</a>';
+            })
+            .join('');
+        } else {
+          resultsContainer.innerHTML = '<p class="no-results">No results found</p>';
+        }
+      }, 300);
+    });
+  })();
+</script>
+
+<style>
+  .blog-header {
+    text-align: center;
+    padding: 4rem 0 2rem;
+    background: var(--bg-secondary);
+  }
+
+  .blog-header h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .blog-header p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+  }
+
+  .search-container {
+    max-width: 500px;
+    margin: 2rem auto 0;
+    position: relative;
+  }
+
+  .search-container :global(.search-input) {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+
+  .search-container :global(.search-input:focus) {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .search-container :global(.search-results) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+  }
+
+  .search-container :global(.search-result) {
+    display: block;
+    padding: 1rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+  }
+
+  .search-container :global(.search-result:last-child) {
+    border-bottom: none;
+  }
+
+  .search-container :global(.search-result:hover) {
+    background: var(--bg-secondary);
+  }
+
+  .search-container :global(.search-result strong) {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .search-container :global(.search-result p) {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .search-container :global(.no-results),
+  .search-container :global(.search-note) {
+    padding: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem;
+  }
+</style>

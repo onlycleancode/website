@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServerVisualization from '../components/ServerVisualization.astro';
+import ServerPopup from '../components/ServerPopup.astro';
+---
+
+<BaseLayout title="Joel Montano - Personal Website">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Welcome</h1>
+      <p class="description">
+        <!-- Your blurb goes here. Edit this text to introduce yourself and what you do. -->
+        I'm a developer passionate about building systems, exploring AI, and understanding how things work under the hood.
+      </p>
+    </div>
+  </section>
+
+  <!-- Server Visualization Section -->
+  <section class="section server-section">
+    <div class="container">
+      <h2>Explore My Work</h2>
+      <p>Click on a server component to discover related projects and articles.</p>
+      <ServerVisualization />
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section section-alt">
+    <div class="container">
+      <h2>Get In Touch</h2>
+      <p>Interested in working together? Let's connect.</p>
+      <div class="contact-links">
+        <a href="mailto:your.email@example.com">Email</a>
+        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://twitter.com/yourusername" target="_blank" rel="noopener noreferrer">Twitter</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Server Component Popup -->
+  <ServerPopup />
+</BaseLayout>
+
+<script>
+  import '../scripts/server-interaction.js';
+</script>

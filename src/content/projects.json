@@ -1,0 +1,51 @@
+{
+  "web": [
+    {
+      "name": "Personal Website",
+      "url": "https://github.com/yourusername/website",
+      "description": "This website - built with Astro"
+    }
+  ],
+  "switch": [
+    {
+      "name": "Network Tools",
+      "url": "https://github.com/yourusername/network-tools",
+      "description": "Collection of networking utilities"
+    }
+  ],
+  "host": [
+    {
+      "name": "OS Experiments",
+      "url": "https://github.com/yourusername/os-experiments",
+      "description": "Operating system exploration"
+    }
+  ],
+  "gpu-ai": [
+    {
+      "name": "LLM Experiments",
+      "url": "https://github.com/yourusername/llm-experiments",
+      "description": "Experiments with language models"
+    }
+  ],
+  "gpu-infra": [
+    {
+      "name": "Training Pipeline",
+      "url": "https://github.com/yourusername/training-pipeline",
+      "description": "Distributed training infrastructure"
+    }
+  ],
+  "storage": [
+    {
+      "name": "Simple Database",
+      "url": "https://github.com/yourusername/simple-db",
+      "description": "A key-value store from scratch"
+    }
+  ],
+  "distributed": [
+    {
+      "name": "Distributed Systems",
+      "url": "https://github.com/yourusername/distributed-systems",
+      "description": "Distributed computing experiments"
+    }
+  ]
+}
