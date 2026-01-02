@@ -564,8 +564,10 @@ h6,
 }
 
 .carousel-item {
-    min-width: 300px;
-    /* Match container width */
+    flex: 0 0 100%;
+    /* One item per view */
+    max-width: 100%;
+    /* Ensure it doesn't overflow */
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     padding: 2rem;
