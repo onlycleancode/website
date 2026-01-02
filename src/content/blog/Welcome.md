@@ -1,7 +1,7 @@
 ---
 title: "Welcome"
 description: "Quick Intro & Early ideas"
-pubDate: 2025-12-31
+pubDate: 2026-01-01T12:00:00Z
 tags: ["intro"]
 draft: false
 ---
