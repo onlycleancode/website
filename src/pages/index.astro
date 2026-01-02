@@ -6,21 +6,81 @@ import ServerPopup from '../components/ServerPopup.astro';
 
 <BaseLayout title="Joel Montano - Personal Website">
   <!-- Hero Section -->
+  <!-- Hero Section -->
   <section class="hero">
     <div class="container">
-      <h1>Hello!</h1>
+      <h1>I'm Joel.</h1>
       <p class="description">
-        I'm Joel, a TPM working on securing supercomputer infrastructure at Microsoft. This site's main goal is to host my writing and projects as I dive deep into full-stack computing. As the singularity approaches, I believe inutitive understanding of the computing systems powering AI will be a key differentiator in the short-mid term. It won't all be blog posts, I'll including personal rants and ideas too nuanced for Twitter as well. Feel free to explore & reach out!
+        I am a TPM working on securing supercomputer infrastructure at Microsoft.
+      </p>
+      <p class="description" style="margin-top: 1rem;">
+        This site hosts my writing and projects as I dive deep into full-stack computing. As the singularity approaches, I believe an intuitive understanding of the computing systems powering AI will be a key differentiator.
       </p>
     </div>
   </section>
 
   <!-- Server Visualization Section -->
-  <section class="section server-section">
+  <!-- Projects Section -->
+  <section class="section projects-section">
     <div class="container">
-      <h2>Explore My Work</h2>
-      <p>I am learning full-stack computing, from the hardware all the way up the abstraction layers to web apps powering most of the internet today. Each component below represents a layer of the stack I am either reading, writing, or building in. As these are the early days (01/2026) there isn't much there but that will change soon.</p>
+      <h2>Projects</h2>
+      
+      <p class="section-intro">
+        Explore my work below. A few highlighted projects (coming soon), or click the diagram layers for a full breakdown.
+      </p>
+
+      <!-- Highlighted Projects (Carousel) -->
+      <div class="highlighted-projects">
+        <div class="caution-tape"></div>
+        <div class="carousel-container">
+          <button class="carousel-nav prev" aria-label="Previous project">&lt;</button>
+          
+          <div class="carousel-track-container">
+            <div class="carousel-track">
+              <!-- Tile 1 -->
+              <button class="construction-card carousel-item" data-action="construction-popup" type="button">
+                <div class="card-content">
+                  <h3>Project 01</h3>
+                </div>
+                <div class="coming-soon-ribbon">Coming Soon</div>
+              </button>
+              
+              <!-- Tile 2 -->
+              <button class="construction-card carousel-item" data-action="construction-popup" type="button">
+                <div class="card-content">
+                  <h3>Project 02</h3>
+                </div>
+                <div class="coming-soon-ribbon">Coming Soon</div>
+              </button>
+              
+              <!-- Tile 3 -->
+              <button class="construction-card carousel-item" data-action="construction-popup" type="button">
+                 <div class="card-content">
+                  <h3>Project 03</h3>
+                </div>
+                <div class="coming-soon-ribbon">Coming Soon</div>
+              </button>
+            </div>
+          </div>
+
+          <button class="carousel-nav next" aria-label="Next project">&gt;</button>
+        </div>
+        <div class="caution-tape"></div>
+      </div>
+      
       <ServerVisualization />
+    </div>
+  </section>
+
+  <!-- Coming Soon Popup -->
+  <div id="construction-popup" class="construction-popup-overlay" aria-hidden="true">
+    <div class="construction-popup-content">
+      <div class="caution-stripe-top"></div>
+      <p>Coming Soon...</p>
+      <button class="construction-popup-close">Close</button>
+    </div>
+  </div>
+      
     </div>
   </section>
 
@@ -28,12 +88,12 @@ import ServerPopup from '../components/ServerPopup.astro';
   <section id="contact" class="section section-alt">
     <div class="container">
       <h2>Get In Touch</h2>
-      <p>Interested in working together? Let's connect.</p>
+      <p>Connect with me:</p>
       <div class="contact-links">
-        <a href="mailto:your.email@example.com">Email</a>
-        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://twitter.com/yourusername" target="_blank" rel="noopener noreferrer">Twitter</a>
+        <a href="mailto:joel97montano@gmail.com">Email</a>
+        <a href="https://github.com/onlycleancode" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://linkedin.com/in/joelmontanoucf" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://twitter.com/aisloppyjoel" target="_blank" rel="noopener noreferrer">Twitter/X</a>
       </div>
     </div>
   </section>
@@ -44,4 +104,5 @@ import ServerPopup from '../components/ServerPopup.astro';
 
 <script>
   import '../scripts/server-interaction.js';
+  import '../scripts/carousel.js';
 </script>

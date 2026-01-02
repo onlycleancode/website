@@ -31,6 +31,10 @@ const componentInfo = {
     title: 'Distributed Systems',
     description: 'Distributed computing, system design, and scalable architectures.',
   },
+  upcoming: {
+    title: 'Work in Progress',
+    description: 'Projects currently under active development. Stay tuned for updates.',
+  },
 };
 
 // Manual project entries (edit this to add your GitHub projects)
