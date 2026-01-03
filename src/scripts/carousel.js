@@ -3,35 +3,97 @@
 const track = document.querySelector('.carousel-track');
 const prevBtn = document.querySelector('.carousel-nav.prev');
 const nextBtn = document.querySelector('.carousel-nav.next');
-const items = document.querySelectorAll('.carousel-item');
+// Get initial items before cloning
+let items = Array.from(document.querySelectorAll('.carousel-item'));
 
 if (track && prevBtn && nextBtn && items.length > 0) {
-    let currentIndex = 0;
+    // 1. Clone First and Last Items
+    const firstClone = items[0].cloneNode(true);
+    const lastClone = items[items.length - 1].cloneNode(true);
 
-    const updateCarousel = () => {
-        const itemWidth = items[0].getBoundingClientRect().width;
-        // Gap is handled by flex gap in CSS, but for transform translate we need to account for it or just scroll by percentage if using 100% width items.
-        // Simpler approach for "one at a time": scrollIntoView or strictly translating by 100%.
-        // To keep it perfectly centered single file, let's assume we show one item at a time.
+    // Tag them for debugging/styling if needed
+    firstClone.dataset.clone = 'first';
+    lastClone.dataset.clone = 'last';
 
-        // Using scrollLeft on container is smoother/easier for "scroll-snap" CSS, but buttons need to trigger it.
-        // Let's use the track container scroll.
-        const container = document.querySelector('.carousel-track-container');
-        const scrollAmount = currentIndex * container.offsetWidth;
-        container.scrollTo({
-            left: scrollAmount,
-            behavior: 'smooth'
-        });
+    // 2. Append/Prepend Clones
+    track.appendChild(firstClone);
+    track.insertBefore(lastClone, items[0]);
+
+    // 3. Re-select all items including clones
+    let allItems = document.querySelectorAll('.carousel-item');
+
+    // 4. State
+    let currentIndex = 1; // Start at the first REAL item (index 1)
+    let isTransitioning = false;
+    const transitionSpeed = 300; // ms, matches CSS
+
+    // 5. Initial Position
+    const updatePosition = (jump = false) => {
+        const itemWidth = allItems[0].getBoundingClientRect().width;
+        // If we want a gap, we must include it. global.css shows no gap on .carousel-track?
+        // Actually .carousel-container has gap: 1rem, but track is flex.
+        // Let's assume the item width is the full slide distance for now.
+        // Wait, .carousel-track has display: flex.
+        // If there are gaps logic might be off, but usually carousel items are 100% width.
+        // .carousel-item has flex: 0 0 100%. So width is reliable.
+
+        const offset = -currentIndex * itemWidth;
+
+        if (jump) {
+            track.style.transition = 'none';
+        } else {
+            track.style.transition = `transform ${transitionSpeed}ms ease-out`;
+        }
+
+        track.style.transform = `translateX(${offset}px)`;
     };
 
-    nextBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % items.length;
-        updateCarousel();
+    // Set initial position immediately (no animation)
+    updatePosition(true);
+
+    // 6. Navigation Logic
+    const nextSlide = () => {
+        if (isTransitioning) return;
+        if (currentIndex >= allItems.length - 1) return;
+
+        isTransitioning = true;
+        currentIndex++;
+        updatePosition();
+    };
+
+    const prevSlide = () => {
+        if (isTransitioning) return;
+        if (currentIndex <= 0) return;
+
+        isTransitioning = true;
+        currentIndex--;
+        updatePosition();
+    };
+
+    // 7. Event Listeners
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    // 8. Handle "Teleporting" on Transition End
+    track.addEventListener('transitionend', () => {
+        isTransitioning = false;
+
+        // If we are at the "first clone" (end of list), jump to start
+        if (allItems[currentIndex].dataset.clone === 'first') {
+            currentIndex = 1;
+            updatePosition(true);
+        }
+
+        // If we are at the "last clone" (start of list), jump to end
+        if (allItems[currentIndex].dataset.clone === 'last') {
+            currentIndex = allItems.length - 2;
+            updatePosition(true);
+        }
     });
 
-    prevBtn.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + items.length) % items.length;
-        updateCarousel();
+    // 9. Resize Handler
+    window.addEventListener('resize', () => {
+        updatePosition(true);
     });
 }
 
