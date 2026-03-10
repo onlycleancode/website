@@ -6,7 +6,7 @@ tags: ["intro"]
 draft: false
 ---
 
-They say to "just build", "just post", "just do things" so I'll do just that. The goal is weekly posts, no structure to what gets posted. Technical blogs will not be rushed for the sake of posting (most of the people doing them regularly are heavily AI slop anyway, the internet does not need one more) so the gaps will be filled with whatever is top of mind that week.
+They say to "just build", "just post", "just do things" so I'll do just that. No structure to what gets posted. Technical blogs will not be rushed for the sake of posting (most of the people doing them regularly are heavily AI slop anyway, the internet does not need one more) so expect a mix of technical deep-dives and whatever is top of mind.
 
 ## Top of Mind
 
