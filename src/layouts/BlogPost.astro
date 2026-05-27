@@ -188,6 +188,1105 @@ const formattedUpdateDate = updatedDate?.toLocaleDateString('en-US', {
 </style>
 
 <style is:global>
+  .post-content .token-path-diagram {
+    width: min(96vw, 1120px);
+    margin: 2.75rem 0 3rem 50%;
+    transform: translateX(-50%);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.96)),
+      radial-gradient(circle at 14% 20%, rgba(56, 189, 248, 0.14), transparent 30%),
+      radial-gradient(circle at 84% 74%, rgba(245, 158, 11, 0.12), transparent 30%);
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.38);
+    overflow: hidden;
+  }
+
+  .token-path-diagram__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0;
+  }
+
+  .token-path-diagram__header span:first-child {
+    color: #f8fafc;
+    font-weight: 700;
+  }
+
+  .token-path-diagram__header span:last-child {
+    color: #94a3b8;
+    text-align: right;
+  }
+
+  .token-path-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: rgba(148, 163, 184, 0.16);
+  }
+
+  .token-path-panel {
+    min-width: 0;
+    padding: 1.1rem;
+    background: rgba(15, 23, 42, 0.88);
+  }
+
+  .token-path-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    margin-bottom: 0.85rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 999px;
+    color: #7dd3fc;
+    background: rgba(14, 165, 233, 0.08);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .token-path-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .token-path-svg text {
+    fill: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 0;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+  }
+
+  .token-path-svg marker path {
+    fill: #38bdf8;
+  }
+
+  .diagram-shell {
+    fill: rgba(15, 23, 42, 0.56);
+    stroke: rgba(51, 65, 85, 0.95);
+    stroke-width: 1;
+  }
+
+  .diagram-label {
+    fill: #94a3b8 !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    text-anchor: start !important;
+  }
+
+  .path-note {
+    fill: #cbd5e1 !important;
+    font-size: 10.5px !important;
+    line-height: 1.4;
+    text-anchor: start !important;
+  }
+
+  .gpu-boundary {
+    fill: rgba(30, 41, 59, 0.55);
+    stroke: rgba(56, 189, 248, 0.28);
+    stroke-width: 1;
+  }
+
+  .wafer-boundary {
+    fill: rgba(120, 53, 15, 0.18);
+    stroke: rgba(245, 158, 11, 0.48);
+    stroke-width: 1.2;
+  }
+
+  .token-stack rect {
+    fill: rgba(30, 41, 59, 0.92);
+    stroke: rgba(148, 163, 184, 0.26);
+    stroke-width: 1;
+    animation: tokenChipPulse 4s ease-in-out infinite;
+  }
+
+  .token-stack text {
+    fill: #cbd5e1;
+    font-size: 9.5px;
+  }
+
+  .decode-output-token {
+    opacity: 0;
+    animation: decodeTokenAppend1 6s steps(1, end) infinite;
+  }
+
+  .decode-output-token:nth-of-type(2) {
+    animation-name: decodeTokenAppend2;
+  }
+
+  .decode-output-token:nth-of-type(3) {
+    animation-name: decodeTokenAppend3;
+  }
+
+  .decode-output-token:nth-of-type(4) {
+    animation-name: decodeTokenAppend4;
+  }
+
+  .gpu-output-token,
+  .cerebras-output-token {
+    opacity: 0;
+  }
+
+  .gpu-output-token rect,
+  .cerebras-output-token rect {
+    fill: rgba(146, 64, 14, 0.34);
+    stroke: rgba(245, 158, 11, 0.48);
+    stroke-width: 1;
+  }
+
+  .gpu-output-token text,
+  .cerebras-output-token text {
+    fill: #fef3c7;
+    font-size: 9px;
+  }
+
+  .gpu-output-token--1 {
+    animation: gpuOutputToken1 12s steps(1, end) infinite;
+  }
+
+  .gpu-output-token--2 {
+    animation: gpuOutputToken2 12s steps(1, end) infinite;
+  }
+
+  .gpu-output-token--3 {
+    animation: gpuOutputToken3 12s steps(1, end) infinite;
+  }
+
+  .gpu-output-token--4 {
+    animation: gpuOutputToken4 12s steps(1, end) infinite;
+  }
+
+  .cerebras-output-token--1 {
+    animation: cerebrasOutputToken1 12s steps(1, end) infinite;
+  }
+
+  .cerebras-output-token--2 {
+    animation: cerebrasOutputToken2 12s steps(1, end) infinite;
+  }
+
+  .cerebras-output-token--3 {
+    animation: cerebrasOutputToken3 12s steps(1, end) infinite;
+  }
+
+  .cerebras-output-token--4 {
+    animation: cerebrasOutputToken4 12s steps(1, end) infinite;
+  }
+
+  .op-node rect {
+    stroke-width: 1;
+    animation: opPulse 3.4s ease-in-out infinite;
+  }
+
+  .op-node text {
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .op-node text + text,
+  .memory-node text + text {
+    fill: #94a3b8;
+    font-size: 8.5px;
+    font-weight: 500;
+  }
+
+  .op-node--blue rect {
+    fill: rgba(14, 165, 233, 0.14);
+    stroke: rgba(56, 189, 248, 0.42);
+  }
+
+  .op-node--green rect {
+    fill: rgba(34, 197, 94, 0.12);
+    stroke: rgba(74, 222, 128, 0.42);
+  }
+
+  .op-node--amber rect {
+    fill: rgba(245, 158, 11, 0.14);
+    stroke: rgba(251, 191, 36, 0.42);
+  }
+
+  .op-node--orange rect {
+    fill: rgba(249, 115, 22, 0.15);
+    stroke: rgba(251, 146, 60, 0.45);
+  }
+
+  .matrix-grid {
+    fill: none;
+    stroke: rgba(125, 211, 252, 0.42);
+    stroke-width: 1;
+  }
+
+  .kv-store > rect:first-child,
+  .memory-node > rect:first-child,
+  .handoff-node rect {
+    fill: rgba(20, 83, 45, 0.18);
+    stroke: rgba(34, 197, 94, 0.38);
+    stroke-width: 1;
+  }
+
+  .memory-node > rect:first-child {
+    fill: rgba(88, 28, 135, 0.16);
+    stroke: rgba(167, 139, 250, 0.42);
+  }
+
+  .handoff-node rect {
+    fill: rgba(8, 47, 73, 0.28);
+    stroke: rgba(56, 189, 248, 0.45);
+  }
+
+  .kv-store rect:not(:first-child),
+  .memory-node rect:not(:first-child) {
+    fill: #22c55e;
+    opacity: 0.7;
+    animation: kvRowPulse 2.8s ease-in-out infinite;
+  }
+
+  .memory-node rect:not(:first-child) {
+    fill: #a78bfa;
+  }
+
+  .token-path-diagram--hardware .memory-node .gpu-kv-row {
+    fill: #22c55e;
+    opacity: 0;
+    animation: none;
+  }
+
+  .gpu-kv-row--1 {
+    animation: gpuKvRow1 12s steps(1, end) infinite !important;
+  }
+
+  .gpu-kv-row--2 {
+    animation: gpuKvRow2 12s steps(1, end) infinite !important;
+  }
+
+  .gpu-kv-row--3 {
+    animation: gpuKvRow3 12s steps(1, end) infinite !important;
+  }
+
+  .gpu-kv-row--4 {
+    animation: gpuKvRow4 12s steps(1, end) infinite !important;
+  }
+
+  .gpu-kv-row--5 {
+    animation: gpuKvRow5 12s steps(1, end) infinite !important;
+  }
+
+  .gpu-kv-row--6 {
+    fill: #f59e0b !important;
+    animation: gpuKvDecodeRow 12s steps(1, end) infinite !important;
+  }
+
+  .token-path-diagram--hardware .kv-store .cerebras-kv-row {
+    opacity: 0;
+    animation: cerebrasKvRows 12s steps(1, end) infinite !important;
+  }
+
+  .kv-new-row {
+    fill: #f59e0b !important;
+    opacity: 1 !important;
+    animation: kvNewRow 2s ease-in-out infinite !important;
+  }
+
+  .token-path-diagram--phases .kv-store .kv-fill-row {
+    opacity: 0;
+    transform: none;
+    animation: kvStackFill 6s steps(1, end) infinite !important;
+    animation-delay: calc(var(--i, 0) * 0.28s) !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--1 {
+    animation: phasePrefillKvRow1 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--2 {
+    animation: phasePrefillKvRow2 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--3 {
+    animation: phasePrefillKvRow3 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--4 {
+    animation: phasePrefillKvRow4 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--5 {
+    animation: phasePrefillKvRow5 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--6 {
+    animation: phasePrefillKvRow6 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store .phase-prefill-kv-row--7 {
+    animation: phasePrefillKvRow7 6s steps(1, end) infinite !important;
+    animation-delay: 0s !important;
+  }
+
+  .token-path-diagram--phases .kv-store--static .kv-fill-row {
+    opacity: 0.9;
+    animation: none !important;
+  }
+
+  .token-path-diagram--phases .kv-store--static .kv-new-row {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .sm-grid rect,
+  .wafer-tile-grid rect {
+    fill: rgba(56, 189, 248, 0.16);
+    stroke: rgba(125, 211, 252, 0.28);
+    stroke-width: 1;
+    animation: computeTilePulse 1.8s ease-in-out infinite;
+  }
+
+  .sm-grid rect:nth-child(2n),
+  .wafer-tile-grid rect:nth-child(2n) {
+    animation-delay: 0.25s;
+  }
+
+  .sm-grid rect:nth-child(3n),
+  .wafer-tile-grid rect:nth-child(3n) {
+    animation-delay: 0.5s;
+  }
+
+  .wafer-tile-grid rect {
+    fill: rgba(245, 158, 11, 0.18);
+    stroke: rgba(251, 191, 36, 0.32);
+  }
+
+  .flow-line {
+    fill: none;
+    stroke: rgba(100, 116, 139, 0.72);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 6 5;
+    animation: tokenPathDash 1.2s linear infinite;
+  }
+
+  .flow-line--focus {
+    stroke: rgba(56, 189, 248, 0.9);
+    stroke-width: 2.3;
+  }
+
+  .flow-line--read {
+    stroke: rgba(167, 139, 250, 0.9);
+  }
+
+  .flow-line--write {
+    stroke: rgba(34, 197, 94, 0.95);
+  }
+
+  .flow-line--loop {
+    stroke: rgba(245, 158, 11, 0.88);
+  }
+
+  .token-path-diagram--phases .flow-line {
+    display: none;
+  }
+
+  .moving-token {
+    fill: #38bdf8;
+    stroke: #e0f2fe;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.75));
+  }
+
+  .moving-token--focus {
+    fill: #f59e0b;
+    stroke: #fef3c7;
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.85));
+  }
+
+  .moving-token--ghost {
+    fill: #38bdf8;
+    opacity: 0.66;
+  }
+
+  .moving-token--read {
+    fill: #a78bfa;
+    stroke: #ede9fe;
+    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.75));
+  }
+
+  .moving-token--write {
+    fill: #22c55e;
+    stroke: #dcfce7;
+    filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.75));
+  }
+
+  .phase-prefill-dot,
+  .phase-decode-dot {
+    opacity: 0;
+  }
+
+  .phase-prefill-dot {
+    animation: phasePrefillDot 6s linear infinite;
+  }
+
+  .phase-decode-dot {
+    animation: phaseDecodeDot 6s linear infinite;
+  }
+
+  .gpu-prefill-dot {
+    opacity: 0;
+    animation: gpuPrefillDot 12s linear infinite;
+  }
+
+  .gpu-decode-dot {
+    opacity: 0;
+  }
+
+  .gpu-decode-dot--1 {
+    animation: gpuDecodeDot1 12s linear infinite;
+  }
+
+  .gpu-decode-dot--2 {
+    animation: gpuDecodeDot2 12s linear infinite;
+  }
+
+  .gpu-decode-dot--3 {
+    animation: gpuDecodeDot3 12s linear infinite;
+  }
+
+  .gpu-decode-dot--4 {
+    animation: gpuDecodeDot4 12s linear infinite;
+  }
+
+  .cerebras-clump,
+  .cerebras-decode-dot {
+    opacity: 0;
+  }
+
+  .cerebras-clump--prefill {
+    animation: cerebrasPrefillClump 12s linear infinite;
+  }
+
+  .cerebras-clump--handoff {
+    animation: cerebrasHandoffClump 12s linear infinite;
+  }
+
+  .cerebras-decode-dot--1 {
+    animation: cerebrasDecodeDot1 12s linear infinite;
+  }
+
+  .cerebras-decode-dot--2 {
+    animation: cerebrasDecodeDot2 12s linear infinite;
+  }
+
+  .cerebras-decode-dot--3 {
+    animation: cerebrasDecodeDot3 12s linear infinite;
+  }
+
+  .cerebras-decode-dot--4 {
+    animation: cerebrasDecodeDot4 12s linear infinite;
+  }
+
+  @keyframes tokenPathDash {
+    to {
+      stroke-dashoffset: -22;
+    }
+  }
+
+  @keyframes tokenChipPulse {
+    0%, 100% {
+      opacity: 0.78;
+    }
+    50% {
+      opacity: 1;
+      stroke: rgba(56, 189, 248, 0.5);
+    }
+  }
+
+  @keyframes decodeTokenAppend1 {
+    0%, 24% {
+      opacity: 0;
+    }
+    28%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes decodeTokenAppend2 {
+    0%, 40% {
+      opacity: 0;
+    }
+    44%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes decodeTokenAppend3 {
+    0%, 56% {
+      opacity: 0;
+    }
+    60%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes decodeTokenAppend4 {
+    0%, 72% {
+      opacity: 0;
+    }
+    76%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillDot {
+    0%, 4% {
+      opacity: 0;
+    }
+    8%, 62% {
+      opacity: 1;
+    }
+    68%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phaseDecodeDot {
+    0%, 4% {
+      opacity: 0;
+    }
+    8%, 78% {
+      opacity: 1;
+    }
+    84%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow1 {
+    0%, 52% {
+      opacity: 0;
+    }
+    54%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow2 {
+    0%, 54% {
+      opacity: 0;
+    }
+    56%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow3 {
+    0%, 56% {
+      opacity: 0;
+    }
+    58%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow4 {
+    0%, 58% {
+      opacity: 0;
+    }
+    60%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow5 {
+    0%, 60% {
+      opacity: 0;
+    }
+    62%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow6 {
+    0%, 62% {
+      opacity: 0;
+    }
+    64%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes phasePrefillKvRow7 {
+    0%, 64% {
+      opacity: 0;
+    }
+    66%, 90% {
+      opacity: 1;
+    }
+    94%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuPrefillDot {
+    0%, 2% {
+      opacity: 0;
+    }
+    4%, 30% {
+      opacity: 1;
+    }
+    34%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuDecodeDot1 {
+    0%, 45% {
+      opacity: 0;
+    }
+    47%, 55% {
+      opacity: 1;
+    }
+    57%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuDecodeDot2 {
+    0%, 57% {
+      opacity: 0;
+    }
+    59%, 67% {
+      opacity: 1;
+    }
+    69%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuDecodeDot3 {
+    0%, 69% {
+      opacity: 0;
+    }
+    71%, 79% {
+      opacity: 1;
+    }
+    81%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuDecodeDot4 {
+    0%, 81% {
+      opacity: 0;
+    }
+    83%, 91% {
+      opacity: 1;
+    }
+    93%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuKvRow1 {
+    0%, 28% {
+      opacity: 0;
+    }
+    30%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuKvRow2 {
+    0%, 30% {
+      opacity: 0;
+    }
+    32%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuKvRow3 {
+    0%, 32% {
+      opacity: 0;
+    }
+    34%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuKvRow4 {
+    0%, 34% {
+      opacity: 0;
+    }
+    36%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuKvRow5 {
+    0%, 36% {
+      opacity: 0;
+    }
+    38%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuKvDecodeRow {
+    0%, 82% {
+      opacity: 0;
+    }
+    84%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuOutputToken1 {
+    0%, 56% {
+      opacity: 0;
+    }
+    58%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuOutputToken2 {
+    0%, 68% {
+      opacity: 0;
+    }
+    70%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuOutputToken3 {
+    0%, 80% {
+      opacity: 0;
+    }
+    82%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes gpuOutputToken4 {
+    0%, 92% {
+      opacity: 0;
+    }
+    94%, 96% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasPrefillClump {
+    0%, 6% {
+      opacity: 0;
+    }
+    8%, 30% {
+      opacity: 1;
+    }
+    32%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasKvRows {
+    0%, 30% {
+      opacity: 0;
+    }
+    32%, 94% {
+      opacity: 0.85;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasHandoffClump {
+    0%, 34% {
+      opacity: 0;
+    }
+    36%, 48% {
+      opacity: 1;
+    }
+    50%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasDecodeDot1 {
+    0%, 51% {
+      opacity: 0;
+    }
+    53%, 55% {
+      opacity: 1;
+    }
+    57%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasDecodeDot2 {
+    0%, 55% {
+      opacity: 0;
+    }
+    57%, 59% {
+      opacity: 1;
+    }
+    61%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasDecodeDot3 {
+    0%, 59% {
+      opacity: 0;
+    }
+    61%, 63% {
+      opacity: 1;
+    }
+    65%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasDecodeDot4 {
+    0%, 63% {
+      opacity: 0;
+    }
+    65%, 67% {
+      opacity: 1;
+    }
+    69%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasOutputToken1 {
+    0%, 55% {
+      opacity: 0;
+    }
+    57%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasOutputToken2 {
+    0%, 59% {
+      opacity: 0;
+    }
+    61%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasOutputToken3 {
+    0%, 63% {
+      opacity: 0;
+    }
+    65%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes cerebrasOutputToken4 {
+    0%, 67% {
+      opacity: 0;
+    }
+    69%, 94% {
+      opacity: 1;
+    }
+    98%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes opPulse {
+    0%, 100% {
+      opacity: 0.88;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes kvRowPulse {
+    0%, 100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 0.95;
+    }
+  }
+
+  @keyframes kvStackFill {
+    0%, 14% {
+      opacity: 0;
+    }
+    18%, 82% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes kvNewRow {
+    0%, 100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes computeTilePulse {
+    0%, 100% {
+      opacity: 0.62;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 920px) {
+    .post-content .token-path-diagram {
+      width: 100%;
+      margin-left: 0;
+      transform: none;
+    }
+
+    .token-path-grid {
+      display: block;
+    }
+
+    .token-path-panel + .token-path-panel {
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .token-path-diagram__header span:last-child {
+      display: none;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .token-path-panel {
+      overflow-x: auto;
+      padding: 0.9rem;
+    }
+
+    .token-path-svg {
+      min-width: 560px;
+    }
+
+    .token-path-kicker {
+      white-space: normal;
+      line-height: 1.3;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .token-path-svg *,
+    .token-path-svg *::before,
+    .token-path-svg *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    .moving-token {
+      display: none;
+    }
+  }
+</style>
+
+<style is:global>
   .post-content .inference-diagram {
     width: min(92vw, 920px);
     margin: 2.75rem 0 3rem 50%;
