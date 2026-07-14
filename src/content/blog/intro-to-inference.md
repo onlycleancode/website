@@ -5,16 +5,17 @@ pubDate: 2026-05-26T12:00:00Z
 tags: ["ai", "inference", "hardware", "agents"]
 draft: false
 ---
+
 ## Intro
-Skip to Overview for the actual post.
 
-I am back, hopefully! TBH I was never really here but that's because I'm a wagecel w/ a dayjob that got very busy. Excuses aside I still spend a lot of time outside of work reading and thinking about where I want to take my career next. As I work to escape the permanent underclass, my main goal is to understand what skills are limited by 1. model intelligence and 2. current infrastructure. 
+I am back, hopefully! As I work to escape the permanent underclass, my main goal is to understand what skills are limited by 1. model intelligence and 2. current infrastructure.
 
-The reason these two limitations are top of mind is because I think I'm fully AGI-pilled. Not in the "let's think about AI welfare" way but more like having the understanding that the skills of knowledge workers will need to evolve as the models become more capable. It's time to pivot into what models can't do because of limitations 1 & 2. Do I think they solve for these skills eventually? Probably yea - but society moves slowly so I can still contribute for a good chunk of time. (not an AI emdash btw)
+The reason these two limitations are top of mind is because I think I'm fully AGI-pilled. Not in the "let's think about AI welfare" way but in the "these models are very very very capable way." I spend a fair bit of time exploring how skills of knowledge workers will need to evolve as the models become more capable. I am taking the time to pivot into what models can't do because of limitations 1 & 2. Do I think they solve for these skills eventually? Probably yea - but enterprise friction & adoption delay is a very powerful detterent for the time being.
 
-And that has led me to this blog post - I am focused on #2. #1 would be cool and I'm kinda curious about RL, specifically agent RL (shoutout Prime Intellect) but it feels like #1 is the #1 for AI labs as they work to automate AI research and achieve recursive self improvement.
+And that has led me to this blog series, focusing on the bottlenecks of current infrastructure. How can we squeeze the most amount of model performance from the limited compute available to us.
 
 ## Overview
+
 This post will be split into a few sections:
 
 First, we'll dive into why inference. Yes, there are many blog posts on this already so I'll just provide the TLDR.
@@ -25,16 +26,17 @@ This started as an exercise to understand Cerebras after their IPO and it natura
 
 ## Inference Problems
 
-The chat paradigm is dead, it's all about enterprises and agents. Anthropic reportedly hit operating profit in Q2 of 2026 on the back of enterprises rushing to build/run agents for code & knowledge work. It seems they have great margins on running inference and are bottlenecked on capacity. That's one problem: we do not have the capacity for agents to proliferate throughout the economy and it will be a slog to get there. If we can figure out how to squeeze more inference workload from existing capacity then we can mitigate this issue as buildout continues.
+The chat paradigm is dead, it's all about enterprises and agents. Anthropic reportedly hit operating profit in Q2 of 2026 on the back of enterprises rushing to build/run agents for code & knowledge work. It seems they have great margins on running inference and are bottlenecked on capacity. That's one problem: we do not have the capacity for agents to proliferate throughout the economy and it will be a slog to get there. If we can figure out how to squeeze more inference productivity from existing capacity then we can mitigate this issue as buildout continues.
 
-But then the other issue is cost & business risk. Uber, Microsoft, and several tech companies are wary of token budgets and are reportedly exceeding yearly token spend by Q1/Q2 of this year. I do agree with the sentiment Dylan Patel and others have shared that nobody cares about legacy models and the value is captured at the frontier, but at some point enterprises will face the reality that they can't burn this much money on "productivity improvements" that don't translate into improving the bottom line. So while we wait for 10s-100s of GW of capacity to come online, I believe we'll see businesses try to mitigate for the fact that they can't access/afford frontier intelligence by 1. running OS models on their own infra or 2. leveraging non-frontier models. This of course assumes capacity buildout does lag (which I think it will) and enterprises won't layoff & cost-cut just to give the frontier labs more money.
+But then the other issue is cost & business risk. Uber, Microsoft, and several tech companies are wary of token budgets and are reportedly exceeding yearly token spend by Q1/Q2 of this year. I do agree with the sentiment SemiAnalysis and others have shared that nobody cares about legacy models and the value is captured at the frontier, but at some point enterprises will face the reality that they can't burn this much money on "productivity improvements" that don't translate into improving the bottom line. So while we wait for 10s-100s of GW of capacity to come online, I believe we'll see businesses try to mitigate for the fact that they can't access/afford frontier intelligence by 1. running OS models on their own infra or 2. leveraging non-frontier models. This of course assumes capacity buildout does lag (which I think it will) and enterprises won't layoff & cost-cut just to give the frontier labs more money.
 
-And a small point on business risk: I have a lot of respect for Anthropic but there is some sus behavior. Kicking OAI & old Windsurf off claude, "will Anthropic just build it", limited Mythos release, and very strict safeguards (I couldn't learn about the hantavirus cause it triggered their safety filters) gives me the impression many enterprises would rather keep their IP within their trust boundary but nobody can get opus performance without opus. And of course all the other stuff around privacy but that's a given.
+And a small point on business risk: I have a lot of respect for Anthropic but there is a lot of suspect behavior from them. Kicking OAI & old Windsurf off claude, Claude Code (hurting Cursor), Claude Design (hurting Figma), limited Mythos release, and very strict safeguards and arbitrarily enfourced filters gives me the impression many enterprises would rather keep their IP within their trust boundary. The challenge is getting Fable/Opus/Sol performance without Fable/Opus/Sol. And of course all the other stuff around privacy but that's a given.
 
 So now we're here, AGI is being limited by our ability to serve models and inference capacity.
 
 ## Some Technical Background
-High-level you can split inference into prefill and decode. Prefill is the first pass over all of the context, which for agents can get rather heavy: system prompts, user prompts, tools, documents/context, history/memory, scratchpad/CoT, etc. The model processes these tokens in parellel to create the KV cache. Once Prefill is complete, you have a working KV cache that can help make the next part (decode) less expensive since you don't have to recompute the entire context. 
+
+High-level you can split inference into prefill and decode. Prefill is the first pass over all of the context, which for agents can get rather heavy: system prompts, user prompts, tools, documents/context, history/memory, scratchpad/CoT, etc. The model processes these tokens in parellel to create the KV cache. Once Prefill is complete, you have a working KV cache that can help make the next part (decode) less expensive since you don't have to recompute the entire context.
 
 Decode is where the response gets generated by predicting the next token. Prefill controls time to first token and decode controls the overall latency of the final response.
 
@@ -179,7 +181,6 @@ Decode is where the response gets generated by predicting the next token. Prefil
 For agents this can get expensive, the ideal state is you give an agent a /goal and it uses a very smart, but large, model to come up with a working result after calling multiple tools, assessing a bunch of context, and thinking through the problem. This scenario causes a few bottlenecks, especially once you get to agents that run autonmously for several hours (and days-weeks-years in the AGI scenario): do we have enough compute? Do we have enough memory to store the model weights, KV cache, and other intermediate results? Can we move data around fast enough?
 
 These questions led me to start looking into what both NVIDIA and ASIC competitors like Cerebras are doing. The problems are the same but the approaches vary. The NVIDIA marketing is the "AI Factory" - a system of interconnected GPUs that can run inference workloads efficiently - the GPU, CPU, NVLINK. Cerebras has gone all-in on wafer-scale, memory bandwidth maxxing, and some unique system level approaches in disaggregating the inference workloads. (Un)fortunately today it's still not enough to deploy 10 trillion agents to replace all human labor, so we still have jobs!
-
 
 ## Hardware Solutions
 
@@ -346,13 +347,11 @@ Cerebras also addresses the prefill tradeoff by implementing disaggregated infer
   </div>
 </figure>
 
-
 ## Platform Solutions
 
 Fair warning, this section will be rather light as I intend to dive deeper into these problems in future projects/posts. But it's still important to introduce as a lot of thse methods are what the labs and other frontier firms are obsessing about to gain an edge.
 At the node level, this is where NVIDIA's taking the big bet - the "AI Factory." Optimizing kernels, interconnects, new networking protocols, etc, etc. The next step would be extending these AI factories optimizations to heterogenous hardware.
 Then the systems level questions come into play, which I find extremely interesting & where we will spend most of the time in coming posts. In lieu of listing everything out, I suggest taking a look at mini-sglang and nano-vLLM implementations for gaining an understanding of the high-level ideas in relatively straightforward-to-digest code. (Hint, it's how I'm approach learning this problem!)
-
 
 ## Do Agents Change Anything?
 
